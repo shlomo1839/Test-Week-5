@@ -1,6 +1,6 @@
 import express from "express";
-import usersControl from "./routes/orders.js";
-import msssgControl from "./routes/products.js";
+import usersControl from "./routes/users.js";
+import msssgControl from "./routes/messages.js";
 
 import { initSqlDb, getMysqlConnection } from "./utils/mysql.js";
 import { initMongoDb, getMongoDbConnection } from "./utils/mongodb.js";
