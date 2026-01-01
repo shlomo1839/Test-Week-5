@@ -30,8 +30,7 @@ export async function encryptMessage(req, res) {
         } catch (error) {
             console.log(error);
         }
-    
-r    }
+}
 
 export async function decryptMessage(req, res) {
     try {
