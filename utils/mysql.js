@@ -11,7 +11,7 @@ export async function initSqlDb() {
   await conn.query(`CREATE DATABASE IF NOT EXISTS encrypt;`);
   await conn.query(`USE encrypt;`);
   await conn.query(`
-  CREATE TABLE IF NOT EXISTS message (
+  CREATE TABLE IF NOT EXISTS messages (
     id INT PRIMARY KEY AUTO_INCREMENT,
     username VARCHAR(24) NOT NULL,
     cipher_type VARCHAR(24) NOT NULL,

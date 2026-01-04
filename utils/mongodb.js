@@ -1,7 +1,7 @@
 import { MongoClient } from "mongodb";
 
 const MONGO_URL =
-  "mongodb://admin:password123@localhost:27018/products?authSource=admin";
+  "mongodb://admin:password123@localhost:27018/?authSource=admin";
 const DB_NAME = "encript";
 const COLLECTION_NAME = "users";
 
@@ -17,10 +17,7 @@ export async function initMongoDb() {
 
     const usersCollection = mongoConn.collection(COLLECTION_NAME);
     await usersCollection.createIndex({ name: 1 }, { unique: true });
-    await mongocClient.close();
-    mongocClient=null
-    mongoConn=null;
-    
+  
   } catch (error) {
     console.error("Error init database:", error);
     throw error;

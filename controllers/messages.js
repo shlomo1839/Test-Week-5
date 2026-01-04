@@ -2,8 +2,7 @@ import { ObjectId } from "bson";
 
 export async function encryptMessage(req, res) {
     try {
-        const { message, cipherType } = req.body;
-        const user = req.user
+        const { message, cipherType, username } = req.body;
         const mysqlConn = req.mysqlDbConn;
         const mongoCon = req.mongoDbConn;
 
@@ -12,7 +11,6 @@ export async function encryptMessage(req, res) {
             res.status(400).json({error: "missing message or cipherType"})
         }
 
-        let encryptText = "";
         const type = cipherType.toUpperCase();
 
 
@@ -22,12 +20,13 @@ export async function encryptMessage(req, res) {
 
         const encryptedText = message.split('').reverse().join('').toUpperCase();
         
-        const [result] = await dbMysql.query(
-            'insert into messages (username, cipher_type, encryptedText) values (?, ?, ?)',
-            [user.username, type, encryptedText]
+        const [result] = await mysqlConn.query(
+            'insert into messages (username, cipher_type, encrypted_text) values (?, ?, ?)',
+            [username, type, encryptedText]
         )
+        console.log(result)
         await mongoCon.collection('users').updateOne(
-            { username: user.username },
+            { username: username },
             { $inc: { encryptedMessagesCount: 1 } }
         );
 
@@ -47,16 +46,16 @@ export async function encryptMessage(req, res) {
 export async function decryptMessage(req, res) {
     try {
         const { messageId } = req.body;
-        const [rows] = await dbMysql.query('select * from messages where id = ?', [messageId]);
+        const [rows] = await req.mysqlDbConn.query('select * from messages where id = ?', [messageId]);
 
         if (rows.length === 0) {
         return res.status(404).json({ error: 'message not found' });
         }
 
-        const decryptedText = msgData.encrypted_text.split('').reverse().join('');
+        const decryptedText = rows[0].encrypted_text.split('').reverse().join('');
 
         res.status(200).json({
-            id: msgData.id,
+            id: rows[0].id,
             decryptedText: decryptedText
         });
     } catch (err) {

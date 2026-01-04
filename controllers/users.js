@@ -1,4 +1,4 @@
-import { client, ObjectId } from "mongodb";
+import { ObjectId } from "mongodb";
 
 
 
@@ -11,7 +11,7 @@ export async function registerUser (req, res) {
             return res.status(404).json({ error: "missing usernama or passsword"})
         }
 
-        const mongoCon = req.mongoDBcon;
+        const mongoCon = req.mongoDbConn;
 
         // check if exists
         const existsUser = await mongoCon.collection('users').findOne({username});
@@ -37,13 +37,18 @@ export async function registerUser (req, res) {
         })
     } catch (error) {
         console.log(error);
-        
+        res.status(error.status || 500).json({msg: error.message || "Server internal error"})
     }
 }
 export async function getMyProfile(req, res){
-    const user = req.user;
+    try {
+    const {username} = req.body;
+    const user = await req.mongoDbConn.collection('users').findOne({username})
     res.status(200).json({
-    username: user.username, 
+    username: user.username,
     encryptedMessagesCount: user.encryptedMessagesCount
-    });
+    });    
+    } catch (error) {
+        res.status(error.status || 500).json({msg: error.message || "Server internal error"})
+    }   
 }

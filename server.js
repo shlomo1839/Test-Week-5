@@ -49,8 +49,8 @@ const requireAuth = async (req, res, next) => {
 
 
 app.use('/api/auth', usersControl)                   // register
-app.use("/api/users", requireAuth, usersControl);    //
-app.use("/api/messages", requireAuth, msssgControl);
+app.use("/api/users", usersControl);    //
+app.use("/api/messages", msssgControl);
 
 app.listen(PORT, async () => {
   console.log(`server run on ${PORT}...`);

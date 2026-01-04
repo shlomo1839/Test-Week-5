@@ -1,5 +1,5 @@
 import express from 'express';
-import { encryptMessage, decryptMessage } from './controllers/messages.js';
+import { encryptMessage, decryptMessage } from '../controllers/messages.js';
 
 
 const router = express.Router();
