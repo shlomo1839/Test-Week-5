@@ -4,24 +4,36 @@ export async function encryptMessage(req, res) {
     try {
         const { message, cipherType } = req.body;
         const user = req.user
-        const conn = req.mysqlDbConn;
+        const mysqlConn = req.mysqlDbConn;
+        const mongoCon = req.mongoDbConn;
 
 
-
-        if (!message){
-            res.status(400).json({error: "invalid"})
+        if (!message || !cipherType){
+            res.status(400).json({error: "missing message or cipherType"})
         }
-        const encryptedText = message.split('').reverse().touppercase()
+
+        let encryptText = "";
+        const type = cipherType.toUpperCase();
+
+
+        if (type !== 'REVERSE') {
+            return res.status(400).json({ error: "Only 'REVERSE' cipher is supported currently" });
+        }
+
+        const encryptedText = message.split('').reverse().join('').toUpperCase();
         
         const [result] = await dbMysql.query(
             'insert into messages (username, cipher_type, encryptedText) values (?, ?, ?)',
-            [user.username, 'reverse', encryptedText]
+            [user.username, type, encryptedText]
         )
-        await user.updateOne({ _id: user._id })
+        await mongoCon.collection('users').updateOne(
+            { username: user.username },
+            { $inc: { encryptedMessagesCount: 1 } }
+        );
 
         res.status(201).json({
-            id: result.Id,
-            cipherType: 'REVERSE',
+            id: result.insertId,
+            cipherType: type,
             encryptedText: encryptedText
         });
 
@@ -49,6 +61,5 @@ export async function decryptMessage(req, res) {
         });
     } catch (err) {
         console.log(err);
-        
     }
 }

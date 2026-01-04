@@ -1,12 +1,13 @@
 import express from 'express';
-import * as msssgControl from '../controllers/messages.js';
+import { encryptMessage, decryptMessage } from './controllers/messages.js';
 
 
 const router = express.Router();
 
+// POST /api/messages/encrypt
+router.post('/encrypt', encryptMessage);
 
-router.route('/api/messages/')
-    .post(msssgControl.encryptMessage)
-    .post(msssgControl.decryptMessage)
+// POST /api/messages/decrypt
+router.post('/decrypt', decryptMessage);
 
 export default router;
